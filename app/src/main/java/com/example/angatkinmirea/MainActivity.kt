@@ -7,11 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.angatkinmirea.data.repository.TodoRepositoryImpl
-import com.example.angatkinmirea.domain.repository.TodoRepository
-import com.example.angatkinmirea.domain.usecase.GetTodosUseCase
-import com.example.angatkinmirea.domain.usecase.ToggleTodoUseCase
-import com.example.angatkinmirea.navigation.NavGraph
 import com.example.angatkinmirea.presentation.ui.theme.AngatkinMIREATheme
 
 class MainActivity : ComponentActivity() {
@@ -20,16 +15,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AngatkinMIREATheme {
-                NavGraph(context = this)
+                Hello()
             }
         }
     }
 }
 
 @Composable
-fun Hello(name: String, modifier: Modifier = Modifier) {
+fun Hello(modifier: Modifier = Modifier) {
     Text(
-        text = "",
+        text = "Hello World",
         modifier = modifier
     )
 }
