@@ -33,17 +33,3 @@ fun Hello(name: String, modifier: Modifier = Modifier) {
         modifier = modifier
     )
 }
-
-object Creator {
-    fun provideTodoRepository(context: Context): TodoRepository {
-        return TodoRepositoryImpl.getInstance(context)
-    }
-
-    fun provideGetTodosUseCase(context: Context): GetTodosUseCase {
-        return GetTodosUseCase(provideTodoRepository(context))
-    }
-
-    fun provideToggleTodoUseCase(context: Context): ToggleTodoUseCase {
-        return ToggleTodoUseCase(provideTodoRepository(context))
-    }
-}
