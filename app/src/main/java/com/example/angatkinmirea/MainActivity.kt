@@ -57,14 +57,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Hello(modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello World",
-        modifier = modifier
-    )
-}
-
 fun <T> CoroutineScope.debounce(
     waitMs: Long = 500L, destinationFunction: (T) -> Unit): (T) -> Unit {
     var debounceJob: Job? = null
@@ -78,8 +70,8 @@ fun <T> CoroutineScope.debounce(
 }
 
 fun loadRepos(context: Context): List<Repo> {
-    val jsonString = context.assets.open("repos.json").use {
-        it.readBytes().decodeToString()
+    val jsonString = context.assets.open("repos.json").bufferedReader().use {
+        it.readText()
     }
     val repos = Json.decodeFromString<List<Repo>>(jsonString)
     return repos
