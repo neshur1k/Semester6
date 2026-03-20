@@ -40,7 +40,7 @@ class StopwatchService : Service() {
     private var isRunning = false
     private val SERVICE_ID = 100
     private val serviceScope = CoroutineScope(Dispatchers.Default)
-    private var timerJob: Job? = null
+    private var stopwatchJob: Job? = null
 
     companion object {
         const val ACTION_START = "ACTION_START"
@@ -58,8 +58,8 @@ class StopwatchService : Service() {
     }
 
     private fun startStopwatch() {
-        if (timerJob != null) return
-        timerJob = serviceScope.launch {
+        if (stopwatchJob != null) return
+        stopwatchJob = serviceScope.launch {
             while (true) {
                 delay(1000)
                 seconds++
@@ -71,8 +71,8 @@ class StopwatchService : Service() {
     }
 
     private fun pauseStopwatch() {
-        timerJob?.cancel()
-        timerJob = null
+        stopwatchJob?.cancel()
+        stopwatchJob = null
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -86,8 +86,8 @@ class StopwatchService : Service() {
     }
 
     override fun onDestroy() {
-        timerJob?.cancel()
-        timerJob = null
+        stopwatchJob?.cancel()
+        stopwatchJob = null
         super.onDestroy()
     }
 

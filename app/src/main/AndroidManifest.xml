@@ -17,7 +17,10 @@
 
         <service
             android:name=".StopwatchService"
-            android:foregroundServiceType="mediaPlayback"/>
+            android:foregroundServiceType="mediaPlayback" />
+
+        <service
+            android:name=".TimerService" />
 
         <activity
             android:name=".MainActivity"
@@ -36,6 +39,11 @@
         </activity>
         <activity
             android:name=".StopwatchActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AngatkinMIREA">
+        </activity>
+        <activity
+            android:name=".TimerActivity"
             android:exported="true"
             android:theme="@style/Theme.AngatkinMIREA">
         </activity>
