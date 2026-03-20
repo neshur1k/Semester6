@@ -52,6 +52,11 @@
             android:exported="true"
             android:theme="@style/Theme.AngatkinMIREA">
         </activity>
+        <activity
+            android:name=".PhotoActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AngatkinMIREA">
+        </activity>
     </application>
 
 </manifest>
