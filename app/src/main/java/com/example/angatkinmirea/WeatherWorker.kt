@@ -15,6 +15,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import kotlinx.coroutines.delay
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -55,48 +56,56 @@ class WeatherWorker(
     override suspend fun doWork(): Result {
 
         val cities = listOf("Moscow", "London", "NewYork")
-
         val workManager = WorkManager.getInstance(applicationContext)
 
-        val futures = cities.map { city ->
+        val requests = cities.map { city ->
             OneTimeWorkRequestBuilder<CityWeatherWorker>()
                 .setInputData(workDataOf("city" to city))
                 .build()
         }
 
-        // стартуем все воркеры
-        futures.forEach { workManager.enqueue(it) }
+        workManager.enqueue(requests)
 
-        // ждём завершения
-        val results = futures.map { workManager.getWorkInfoByIdLiveData(it.id) }
-            .map { liveData ->
-                suspendCoroutine<WorkInfo> { cont ->
-                    val observer = object : Observer<WorkInfo> {
-                        override fun onChanged(value: WorkInfo) {
-                            if (value.state.isFinished) {
-                                cont.resume(value)
-                                liveData.removeObserver(this)
-                            }
-                        }
-                    }
-                    liveData.observeForever(observer)
-                }
+        // 🔥 ЖДЁМ пока все завершатся
+        var allFinished = false
+        var results: List<WorkInfo>
+
+        while (!allFinished) {
+            delay(500)
+
+            results = requests.map {
+                workManager.getWorkInfoById(it.id).get()
             }
 
-        val temps = results.mapNotNull {
-            val data = it.outputData
-            data.getInt("temp", 0)
+            allFinished = results.all { it.state.isFinished }
         }
 
-        val avg = temps.average().toInt()
+        // теперь точно есть данные
+        val finalResults = requests.map {
+            workManager.getWorkInfoById(it.id).get()
+        }
 
-        // запускаем финальный воркер
-        val reportWork = OneTimeWorkRequestBuilder<ReportWorker>()
-            .setInputData(workDataOf("avg" to avg))
-            .build()
+        val moscow = finalResults.find {
+            it.outputData.getString("city") == "Moscow"
+        }?.outputData?.getInt("temp", 0) ?: 0
 
-        workManager.enqueue(reportWork)
+        val london = finalResults.find {
+            it.outputData.getString("city") == "London"
+        }?.outputData?.getInt("temp", 0) ?: 0
 
-        return Result.success()
+        val newYork = finalResults.find {
+            it.outputData.getString("city") == "NewYork"
+        }?.outputData?.getInt("temp", 0) ?: 0
+
+        val avg = listOf(moscow, london, newYork).average().toInt()
+
+        return Result.success(
+            workDataOf(
+                "Moscow" to moscow,
+                "London" to london,
+                "NewYork" to newYork,
+                "avg" to avg
+            )
+        )
     }
 }
