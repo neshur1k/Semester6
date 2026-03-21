@@ -33,22 +33,28 @@ class CityWeatherWorker(
 
         delay(2000)
 
-        val temp = loadWeatherFromJson(city)
+        val (temp, condition) = loadWeatherFromJson(city)
 
         return Result.success(
             workDataOf(
                 "city" to city,
-                "temp" to temp
+                "temp" to temp,
+                "condition" to condition
             )
         )
     }
 
-    private fun loadWeatherFromJson(city: String): Int {
+    private fun loadWeatherFromJson(city: String): Pair<Int, String> {
         val json = applicationContext.assets.open("weather.json")
             .bufferedReader()
             .use { it.readText() }
 
         val obj = JSONObject(json)
-        return obj.getInt(city)
+        val cityObj = obj.getJSONObject(city)
+
+        val temp = cityObj.getInt("temp")
+        val condition = cityObj.getString("condition")
+
+        return temp to condition
     }
 }
