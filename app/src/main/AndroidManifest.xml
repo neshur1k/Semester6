@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
 
     <application
         android:allowBackup="true"
@@ -76,6 +78,27 @@
             android:exported="true"
             android:theme="@style/Theme.AngatkinMIREA">
         </activity>
+        <activity
+            android:name=".AlarmActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AngatkinMIREA">
+        </activity>
+        <activity
+            android:name=".FactsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AngatkinMIREA">
+        </activity>
+
+        <receiver android:name=".AlarmReceiver"/>
+
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
