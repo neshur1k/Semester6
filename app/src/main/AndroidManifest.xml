@@ -88,6 +88,11 @@
             android:exported="true"
             android:theme="@style/Theme.AngatkinMIREA">
         </activity>
+        <activity
+            android:name=".CurrencyActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AngatkinMIREA">
+        </activity>
 
         <receiver android:name=".AlarmReceiver"/>
 
