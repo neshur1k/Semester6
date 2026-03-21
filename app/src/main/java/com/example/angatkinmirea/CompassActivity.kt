@@ -79,17 +79,12 @@ fun CompassScreen(viewModel: CompassViewModel = viewModel()) {
                 ) {
 
                     Canvas(modifier = Modifier.fillMaxSize(0.8f)) {
-
-                        // круг
                         drawCircle(
                             color = Color.Gray,
                             style = androidx.compose.ui.graphics.drawscope.Stroke(4f)
                         )
 
-                        // стрелка
                         rotate(animatedAngle) {
-
-                            // север (красный)
                             drawLine(
                                 color = Color.Red,
                                 start = center,
@@ -97,7 +92,6 @@ fun CompassScreen(viewModel: CompassViewModel = viewModel()) {
                                 strokeWidth = 8f
                             )
 
-                            // юг (серый)
                             drawLine(
                                 color = Color.Gray,
                                 start = center,

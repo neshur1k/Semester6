@@ -5,7 +5,6 @@ import android.hardware.*
 import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.math.roundToInt
 
 class CompassViewModel(app: Application) : AndroidViewModel(app), SensorEventListener {
 

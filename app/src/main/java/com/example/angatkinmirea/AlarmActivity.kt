@@ -1,6 +1,7 @@
 package com.example.angatkinmirea
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -26,24 +27,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import android.Manifest
+import androidx.compose.ui.unit.sp
 
 class AlarmActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //requestNotificationPermission()
+        requestNotificationPermission()
 
         setContent {
             ReminderScreen(this)
         }
     }
 
-//    private fun requestNotificationPermission() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
-//        }
-//    }
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
+        }
+    }
 }
 
 @Composable
@@ -53,15 +59,15 @@ fun ReminderScreen(context: Context) {
     val enabled = remember { mutableStateOf(prefs.getBoolean("enabled", false)) }
 
     val text = if (enabled.value) {
-        "Включено"
+        "Напоминание включено"
     } else {
-        "Выключено"
+        "Напоминание выключено"
     }
 
     val nextTime = if (enabled.value) {
         "Следующее напоминание: ${AlarmScheduler.getNextTimeText()}"
     } else {
-        "Напоминание выключено"
+        "Нажмите, чтобы включить"
     }
 
     Column(
@@ -69,30 +75,22 @@ fun ReminderScreen(context: Context) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Text("Напоминание о таблетке", style = MaterialTheme.typography.headlineMedium)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(nextTime)
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .background(
+                    if (enabled.value) Color.Green else Color.Gray,
+                    CircleShape
+                )
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Индикатор состояния
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(16.dp)
-                    .background(
-                        if (enabled.value) Color.Green else Color.Gray,
-                        CircleShape
-                    )
-            )
+        Text(text, fontSize = 30.sp)
 
-            Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-            Text(text)
-        }
+        Text(nextTime)
 
         Spacer(modifier = Modifier.height(32.dp))
 

@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
 
     <application
         android:allowBackup="true"
@@ -99,7 +99,9 @@
             android:theme="@style/Theme.AngatkinMIREA">
         </activity>
 
-        <receiver android:name=".AlarmReceiver"/>
+        <receiver
+            android:name=".AlarmReceiver"
+            android:exported="false" />
 
         <receiver
             android:name=".BootReceiver"
