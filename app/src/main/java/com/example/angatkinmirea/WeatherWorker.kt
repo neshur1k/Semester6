@@ -66,7 +66,6 @@ class WeatherWorker(
 
         workManager.enqueue(requests)
 
-        // 🔥 ЖДЁМ пока все завершатся
         var allFinished = false
         var results: List<WorkInfo>
 
@@ -80,7 +79,6 @@ class WeatherWorker(
             allFinished = results.all { it.state.isFinished }
         }
 
-        // теперь точно есть данные
         val finalResults = requests.map {
             workManager.getWorkInfoById(it.id).get()
         }

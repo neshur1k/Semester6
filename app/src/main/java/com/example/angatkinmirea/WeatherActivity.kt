@@ -134,7 +134,6 @@ fun WeatherCard(city: String, temp: Int?, state: WorkInfo.State?) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🌡 Температура
             Text(
                 text = temp?.let { "$it°C" } ?: "—",
                 style = MaterialTheme.typography.bodyLarge
@@ -142,7 +141,6 @@ fun WeatherCard(city: String, temp: Int?, state: WorkInfo.State?) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 🔄 Индикатор + статус
             Row(verticalAlignment = Alignment.CenterVertically) {
 
                 if (state == WorkInfo.State.RUNNING) {
