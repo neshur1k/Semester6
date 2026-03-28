@@ -33,6 +33,9 @@ class PhotoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val workManager = WorkManager.getInstance(this)
+        workManager.cancelAllWorkByTag("PhotoChain")
+        workManager.cancelAllWorkByTag("UniqueWorkTag")
         setContent {
             AngatkinMIREATheme {
                 ProcessPhoto(this)
@@ -45,6 +48,8 @@ class PhotoActivity : ComponentActivity() {
 fun ProcessPhoto(context: Context) {
     val workManager = WorkManager.getInstance(context)
     val photoManager = remember { PhotoWorkManager(context) }
+
+    var fileName by remember { mutableStateOf("photo.jpg") }
 
     var status by remember { mutableStateOf("Ожидание") }
     var result by remember { mutableStateOf("") }
@@ -61,28 +66,24 @@ fun ProcessPhoto(context: Context) {
                 it.state == WorkInfo.State.ENQUEUED
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = status)
-
         Spacer(modifier = Modifier.height(16.dp))
-
         if (isAnyRunning) {
-            LinearProgressIndicator(
-                progress = { progress / 100f },
-            )
+            LinearProgressIndicator(progress = { progress / 100f })
         }
-
         Spacer(modifier = Modifier.height(16.dp))
-
         Button(
             onClick = {
+                fileName = "photo.jpg"
                 workManager.cancelAllWorkByTag("PhotoChain")
-                photoManager.chainOneTimeSampleWork("photo.jpg")
+                photoManager.chainOneTimeSampleWork(fileName)
                 isRunning = true
                 result = ""
             },
@@ -90,26 +91,16 @@ fun ProcessPhoto(context: Context) {
         ) {
             Text("Начать обработку")
         }
-
         Spacer(modifier = Modifier.height(16.dp))
-
         Text(text = result)
     }
 
     workInfos.let { list ->
-        val validWorks = list.filter {
-            it.state != WorkInfo.State.CANCELLED
-        }
-
-        val runningWork = validWorks.find {
-            it.state == WorkInfo.State.RUNNING
-        }
-
+        val validWorks = list.filter { it.state != WorkInfo.State.CANCELLED }
+        val runningWork = validWorks.find { it.state == WorkInfo.State.RUNNING }
         if (runningWork != null) {
             val step = runningWork.progress.getString("step")
-
             progress = runningWork.progress.getInt("progress", 0)
-
             status = when (step) {
                 "compress" -> "Сжимаем фото..."
                 "watermark" -> "Добавляем водяной знак..."
@@ -118,19 +109,16 @@ fun ProcessPhoto(context: Context) {
             }
         } else {
             val lastWork = validWorks.lastOrNull() ?: return@let
-
             when (lastWork.state) {
                 WorkInfo.State.SUCCEEDED -> {
                     status = "Готово!"
                     result = lastWork.outputData.getString("file") ?: ""
                     progress = 100
                 }
-
                 WorkInfo.State.FAILED -> {
                     status = "Ошибка"
                     result = "Что-то пошло не так"
                 }
-
                 else -> {}
             }
         }

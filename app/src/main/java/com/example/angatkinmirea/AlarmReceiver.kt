@@ -11,8 +11,6 @@ import androidx.core.app.NotificationCompat
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
-        Log.d("ALARM", "⏰ 20:00")
-
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

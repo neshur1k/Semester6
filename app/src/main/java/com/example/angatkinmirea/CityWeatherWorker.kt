@@ -37,9 +37,8 @@ class CityWeatherWorker(
 
         return Result.success(
             workDataOf(
-                "city" to city,
-                "temp" to temp,
-                "condition" to condition
+                city to temp,
+                "${city}_condition" to condition
             )
         )
     }

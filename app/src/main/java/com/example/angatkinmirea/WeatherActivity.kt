@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.work.ArrayCreatingInputMerger
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -56,7 +57,6 @@ class WeatherActivity : ComponentActivity() {
 
 @Composable
 fun WeatherScreen(context: Context) {
-
     var moscowTemp by remember { mutableStateOf<Int?>(null) }
     var londonTemp by remember { mutableStateOf<Int?>(null) }
     var newYorkTemp by remember { mutableStateOf<Int?>(null) }
@@ -159,7 +159,9 @@ fun WeatherScreen(context: Context) {
 
                 workIds = requests.map { it.id }
 
-                val reportWorker = OneTimeWorkRequestBuilder<ReportWorker>().build()
+                val reportWorker = OneTimeWorkRequestBuilder<ReportWorker>()
+                    .setInputMerger(ArrayCreatingInputMerger::class.java)
+                    .build()
 
                 workManager
                     .beginWith(requests)
@@ -172,8 +174,9 @@ fun WeatherScreen(context: Context) {
                     workManager.getWorkInfoByIdLiveData(request.id)
                         .observeForever { workInfo ->
                             if (workInfo != null) {
-                                val temp = workInfo.outputData.getInt("temp", 0)
-                                val condition = workInfo.outputData.getString("condition")
+
+                                val temp = workInfo.outputData.getInt(city, 0)
+                                val condition = workInfo.outputData.getString("${city}_condition")
 
                                 when (city) {
                                     "Moscow" -> {
