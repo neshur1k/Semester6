@@ -56,6 +56,8 @@ dependencies {
     //implementation(libs.androidx.ui.test.android)
     implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.ads.mobile.sdk)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.protolite.well.known.types)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     //androidTestImplementation(libs.androidx.espresso.core)
@@ -76,4 +78,5 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }

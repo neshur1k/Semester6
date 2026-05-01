@@ -15,6 +15,8 @@ uiTextGoogleFonts = "1.10.0"
 uiTestAndroid = "1.10.0"
 firebaseCrashlyticsBuildtools = "3.0.6"
 adsMobileSdk = "0.22.0-beta04"
+runtimeLivedata = "1.11.0"
+protoliteWellKnownTypes = "18.0.1"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -39,6 +41,8 @@ androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text
 androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 ads-mobile-sdk = { group = "com.google.android.libraries.ads.mobile.sdk", name = "ads-mobile-sdk", version.ref = "adsMobileSdk" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+protolite-well-known-types = { group = "com.google.firebase", name = "protolite-well-known-types", version.ref = "protoliteWellKnownTypes" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

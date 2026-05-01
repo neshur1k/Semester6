@@ -1,13 +1,9 @@
-package com.example.angatkinmirea
+package com.example.angatkinmirea.module4
 
-import android.annotation.SuppressLint
 import android.content.Context
-import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import java.util.UUID
-import androidx.work.ArrayCreatingInputMerger
 import androidx.work.workDataOf
 
 class PhotoWorkManager(context: Context) {

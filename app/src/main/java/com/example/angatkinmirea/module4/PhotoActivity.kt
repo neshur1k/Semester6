@@ -1,6 +1,5 @@
-package com.example.angatkinmirea
+package com.example.angatkinmirea.module4
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity

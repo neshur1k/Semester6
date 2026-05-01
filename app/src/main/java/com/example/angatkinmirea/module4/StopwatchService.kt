@@ -1,4 +1,4 @@
-package com.example.angatkinmirea
+package com.example.angatkinmirea.module4
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -8,6 +8,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.angatkinmirea.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,13 +23,14 @@ object NotificationHelper {
     fun createNotificationChannel(context: Context) {
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel(CHANNEL_ID,CHANNEL_NAME,
+        val channel = NotificationChannel(
+            CHANNEL_ID, CHANNEL_NAME,
             NotificationManager.IMPORTANCE_LOW)
         notificationManager.createNotificationChannel(channel)
     }
 
     fun createMessage(context: Context, text: String) =
-        NotificationCompat.Builder(context,CHANNEL_ID)
+        NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.circle)
             .setContentTitle("Секундомер работает")
             .setContentText(text)
@@ -77,7 +79,9 @@ class StopwatchService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         NotificationHelper.createNotificationChannel(this)
-        super.startForeground(SERVICE_ID, NotificationHelper.createMessage(this, "Прошло $seconds секунд"))
+        super.startForeground(SERVICE_ID,
+            NotificationHelper.createMessage(this, "Прошло $seconds секунд")
+        )
         when (intent?.action) {
             ACTION_START -> startStopwatch()
             ACTION_PAUSE -> pauseStopwatch()

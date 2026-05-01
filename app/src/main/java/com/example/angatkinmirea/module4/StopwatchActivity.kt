@@ -1,4 +1,4 @@
-package com.example.angatkinmirea
+package com.example.angatkinmirea.module4
 
 import android.app.Activity
 import android.content.Context
@@ -14,14 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -30,47 +26,56 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.startForegroundService
 import com.example.angatkinmirea.ui.theme.AngatkinMIREATheme
 
-class TimerActivity : ComponentActivity() {
+class StopwatchActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             AngatkinMIREATheme {
-                TimerScreen(this)
+                StopwatchScreen(this)
             }
         }
     }
 }
 
 @Composable
-fun TimerScreen(context: Context) {
-    RequestNotificationPermissionTimer(context)
-    var text by remember { mutableStateOf("") }
+fun StopwatchScreen(context: Context) {
+    RequestNotificationPermission(context)
+    val seconds by StopwatchService.secondsFlow.collectAsState()
 
     Column (
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TextField(
-            value = text,
-            onValueChange = { text = it },
-            label = { Text("Секунды") }
-        )
+        Text(text = "$seconds", fontSize = 80.sp)
 
         Spacer(modifier = Modifier.width(60.dp))
 
         Button(onClick = {
-            val seconds = text.toInt().toLong()
-            startTimer(context, seconds)
+            val intent = Intent(context, StopwatchService::class.java).apply {
+                action = StopwatchService.ACTION_START
+            }
+            startForegroundService(context, intent)
         }) {
             Text("Старт")
+        }
+
+        Spacer(modifier = Modifier.width(30.dp))
+
+        Button(onClick = {
+            val intent = Intent(context, StopwatchService::class.java).apply {
+                action = StopwatchService.ACTION_PAUSE
+            }
+            context.startService(intent)
+        }) {
+            Text("Стоп")
         }
     }
 }
 
 @Composable
-fun RequestNotificationPermissionTimer(context: Context) {
+fun RequestNotificationPermission(context: Context) {
     LaunchedEffect(Unit) {
         ActivityCompat.requestPermissions(
             context as Activity,

@@ -1,9 +1,6 @@
-package com.example.angatkinmirea
+package com.example.angatkinmirea.module4
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
