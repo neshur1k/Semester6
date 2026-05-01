@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -70,12 +71,42 @@ class NotesRepository {
         return list.sortedByDescending { it.timestamp }
     }
 
-    private fun extractTimestamp(fileName: String): Long {
-        return try {
-            fileName.split("_")[1].toLong()
-        } catch (e: Exception) {
-            0L
+    fun updateNote(context: Context, fileName: String, text: String) {
+        context.openFileOutput(fileName, Context.MODE_PRIVATE).use {
+            it.write(text.toByteArray())
         }
+    }
+
+    fun updateNoteWithRename(
+        context: Context,
+        oldFileName: String,
+        newTitle: String?,
+        newText: String,
+        timestamp: Long
+    ): String {
+
+        val safeTitle = newTitle?.replace("\\s+".toRegex(), "_") ?: ""
+
+        val newFileName = "timestamp_${timestamp}" +
+                (if (safeTitle.isEmpty()) "" else "_$safeTitle") + ".txt"
+
+        val oldFile = File(context.filesDir, oldFileName)
+        val newFile = File(context.filesDir, newFileName)
+
+        // удаляем старый файл
+        if (oldFile.exists()) oldFile.delete()
+
+        // создаём новый
+        context.openFileOutput(newFileName, Context.MODE_PRIVATE).use {
+            it.write(newText.toByteArray())
+        }
+
+        return newFileName
+    }
+
+    fun extractTimestamp(fileName: String): Long {
+        val parts = fileName.removeSuffix(".txt").split("_")
+        return parts.getOrNull(1)?.toLongOrNull() ?: -1L
     }
 
     fun deleteNote(context: Context, fileName: String) {
@@ -102,6 +133,32 @@ class NotesViewModel : ViewModel() {
         val current = _notes.value?.toMutableList() ?: mutableListOf()
         current.add(0, note)
         _notes.value = current
+    }
+
+    fun updateNote(
+        context: Context,
+        note: Note,
+        newTitle: String?,
+        newText: String
+    ) {
+        val newFileName = repo.updateNoteWithRename(
+            context,
+            note.fileName,
+            newTitle,
+            newText,
+            note.timestamp
+        )
+
+        val current = _notes.value?.toMutableList() ?: mutableListOf()
+
+        val index = current.indexOfFirst { it.fileName == note.fileName }
+        if (index != -1) {
+            current[index] = note.copy(
+                fileName = newFileName,
+                text = newText
+            )
+            _notes.value = current
+        }
     }
 
     fun deleteNote(context: Context, note: Note) {
@@ -155,6 +212,8 @@ fun MainScreen(viewModel: NotesViewModel, context: Context) {
 
         "edit" -> selectedNote?.let { note ->
             EditNoteScreen(
+                viewModel = viewModel,
+                context = context,
                 note = note,
                 onBack = { screen = "list" }
             )
@@ -218,28 +277,44 @@ fun NoteItem(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val date = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-        .format(Date(note.timestamp))
-
+    val title = extractTitle(note.fileName)
+    val date = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date(note.timestamp))
     val preview = if (note.text.length > 40) {
         note.text.take(40) + "..."
     } else note.text
 
     var expanded by remember { mutableStateOf(false) }
 
-    Box {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant, // 🔥 светло-серый
+                    shape = MaterialTheme.shapes.medium
+                )
                 .combinedClickable(
                     interactionSource = remember { MutableInteractionSource() },
-                    indication = null, // 🔥 ВОТ ЭТО ВАЖНО
+                    indication = null,
                     onClick = onClick,
                     onLongClick = { expanded = true }
                 )
                 .padding(16.dp)
         ) {
+            if (title.isNotBlank()) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(Modifier.height(4.dp))
+            }
             Text(date, style = MaterialTheme.typography.labelSmall)
+            Spacer(Modifier.height(4.dp))
             Text(preview, style = MaterialTheme.typography.bodyLarge)
         }
 
@@ -315,10 +390,13 @@ fun AddNoteScreen(
 
 @Composable
 fun EditNoteScreen(
+    viewModel: NotesViewModel,
+    context: Context,
     note: Note,
     onBack: () -> Unit
 ) {
 
+    var title by remember { mutableStateOf(extractTitle(note.fileName)) }
     var text by remember { mutableStateOf(note.text) }
 
     Column(
@@ -327,7 +405,12 @@ fun EditNoteScreen(
             .padding(16.dp)
     ) {
 
-        Text("Редактирование", style = MaterialTheme.typography.titleLarge)
+        OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
+            label = { Text("Заголовок") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(Modifier.height(12.dp))
 
@@ -341,8 +424,26 @@ fun EditNoteScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        Button(onClick = onBack) {
-            Text("Назад")
+        Row {
+            Button(
+                onClick = {
+                    viewModel.updateNote(context, note, title, text)
+                    onBack()
+                }
+            ) {
+                Text("Сохранить")
+            }
+
+            Spacer(Modifier.width(8.dp))
+
+            Button(onClick = onBack) {
+                Text("Назад")
+            }
         }
     }
+}
+
+fun extractTitle(fileName: String): String {
+    val parts = fileName.removeSuffix(".txt").split("_")
+    return parts.getOrNull(2)?.replace("_", " ")?.trim().orEmpty()
 }
