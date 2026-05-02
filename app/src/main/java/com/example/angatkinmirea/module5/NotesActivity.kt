@@ -93,10 +93,8 @@ class NotesRepository {
         val oldFile = File(context.filesDir, oldFileName)
         val newFile = File(context.filesDir, newFileName)
 
-        // удаляем старый файл
         if (oldFile.exists()) oldFile.delete()
 
-        // создаём новый
         context.openFileOutput(newFileName, Context.MODE_PRIVATE).use {
             it.write(newText.toByteArray())
         }
@@ -115,7 +113,6 @@ class NotesRepository {
     }
 }
 
-// ===================== VIEWMODEL =====================
 class NotesViewModel : ViewModel() {
 
     private val repo = NotesRepository()
@@ -170,7 +167,6 @@ class NotesViewModel : ViewModel() {
     }
 }
 
-// ===================== UI =====================
 class NotesActivity : ComponentActivity() {
 
     private val viewModel by viewModels<NotesViewModel>()
@@ -295,7 +291,7 @@ fun NoteItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = MaterialTheme.colorScheme.surfaceVariant, // 🔥 светло-серый
+                    color = MaterialTheme.colorScheme.surfaceVariant,
                     shape = MaterialTheme.shapes.medium
                 )
                 .combinedClickable(

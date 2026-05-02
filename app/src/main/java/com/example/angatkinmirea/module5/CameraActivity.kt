@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,8 +52,6 @@ class CameraActivity : ComponentActivity() {
     }
 }
 
-// ================= VIEWMODEL =================
-
 class PhotoViewModel(application: Application) : AndroidViewModel(application) {
 
     private val context = getApplication<Application>()
@@ -78,8 +78,6 @@ class PhotoViewModel(application: Application) : AndroidViewModel(application) {
         _photos.add(0, file)
     }
 }
-
-// ================= UI =================
 
 @Composable
 fun PhotoGalleryScreen(viewModel: PhotoViewModel = viewModel()) {
@@ -111,8 +109,6 @@ fun PhotoGalleryScreen(viewModel: PhotoViewModel = viewModel()) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-
-                    // запрос камеры
                     cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
 
                     val file = createImageFile(context)
@@ -143,7 +139,6 @@ fun PhotoGalleryScreen(viewModel: PhotoViewModel = viewModel()) {
 
                         exportToGallery(context, file)
 
-                        // ✔ правильный способ показать Snackbar
                         scope.launch {
                             snackbarHostState.showSnackbar("Фото добавлено в галерею")
                         }
@@ -153,9 +148,6 @@ fun PhotoGalleryScreen(viewModel: PhotoViewModel = viewModel()) {
         }
     }
 }
-
-
-// ================= GRID =================
 
 @Composable
 fun PhotoGrid(
@@ -167,8 +159,9 @@ fun PhotoGrid(
     ) {
         items(photos) { file ->
 
+            var expanded by remember { mutableStateOf(false) }
+
             Box {
-                // Фото
                 AsyncImage(
                     model = file,
                     contentDescription = null,
@@ -178,22 +171,33 @@ fun PhotoGrid(
                     contentScale = ContentScale.Crop
                 )
 
-                // Кнопка экспорта
-                Button(
-                    onClick = { onExport(file) },
+                IconButton(
+                    onClick = { expanded = true },
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(4.dp)
+                        .align(Alignment.TopEnd)
                 ) {
-                    Text("Экспорт")
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "menu"
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Экспорт в галерею") },
+                        onClick = {
+                            expanded = false
+                            onExport(file)
+                        }
+                    )
                 }
             }
         }
     }
 }
-
-
-// ================= EMPTY =================
 
 @Composable
 fun EmptyScreen() {
@@ -208,15 +212,11 @@ fun EmptyScreen() {
     }
 }
 
-// ================= FILE =================
-
 fun createImageFile(context: Context): File {
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
     val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
     return File(storageDir, "IMG_${timeStamp}.jpg")
 }
-
-// ================= EXPORT =================
 
 fun exportToGallery(context: Context, sourceFile: File) {
 

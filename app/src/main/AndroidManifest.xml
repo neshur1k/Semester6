@@ -51,6 +51,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".module5.todolist.TodoActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AngatkinMIREA">
+        </activity>
 
     </application>
 
